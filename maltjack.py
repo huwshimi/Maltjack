@@ -13,6 +13,16 @@ BUILD_DIR = 'build'
 CONTENT_DIR = 'content'
 
 class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+
+    def translate_path(self, path):
+        path = path.strip('/')
+        file_path = os.path.join(ARGS.directory, BUILD_DIR)
+        filename =  os.path.join(file_path, '%s.html' % path)
+        if os.path.isfile(filename):
+            return filename
+        else:
+            return os.path.join(file_path, path, 'index.html')
+
     def do_GET(self):
         build_site(ARGS.directory)
         os.chdir(os.path.join(ARGS.directory, BUILD_DIR))
