@@ -7,14 +7,21 @@ import SocketServer
 from jinja2 import Environment, FileSystemLoader
 
 
+ARGS = None
 PORT = 8000
 BUILD_DIR = 'build'
 CONTENT_DIR = 'content'
 
-def build_site(root_dir):
-    env = Environment(loader=FileSystemLoader(root_dir))
-    content_dir = os.path.join(root_dir, 'content')
-    build_dir = os.path.join(root_dir, BUILD_DIR)
+class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        build_site(ARGS.directory)
+        os.chdir(os.path.join(ARGS.directory, BUILD_DIR))
+        SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+
+def build_site(project_dir):
+    env = Environment(loader=FileSystemLoader(project_dir))
+    content_dir = os.path.join(project_dir, 'content')
+    build_dir = os.path.join(project_dir, BUILD_DIR)
     if os.path.exists(build_dir):
         shutil.rmtree(build_dir)
     os.makedirs(build_dir)
@@ -31,9 +38,9 @@ def build_site(root_dir):
             with open(build_path, 'w') as f:
                 f.write(rendered)
 
-def run_server(root_dir):
-    os.chdir(os.path.join(root_dir, BUILD_DIR))
-    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+def run_server(project_dir):
+    os.chdir(os.path.join(project_dir, BUILD_DIR))
+    Handler = ServerHandler
     httpd = SocketServer.TCPServer(("", PORT), Handler)
     print ("Maltjack is serving at http://localhost:%s/\n"
            "Press ctrl+c to stop." % PORT)
@@ -45,6 +52,6 @@ def get_args():
     return parser.parse_args()
 
 if __name__ == "__main__":
-    args = get_args()
-    build_site(args.directory)
-    run_server(args.directory)
+    ARGS = get_args()
+    build_site(ARGS.directory)
+    run_server(ARGS.directory)
