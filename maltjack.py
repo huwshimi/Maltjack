@@ -84,10 +84,14 @@ def build_scss(media_build):
                 os.remove(os.path.join(root, f))
 
 def build_media(project_dir, build_dir):
-    media_dir = os.path.join(project_dir, 'template', MEDIA_DIR)
-    media_build = os.path.join(build_dir, MEDIA_DIR)
-    shutil.copytree(media_dir, media_build)
-    build_scss(media_build)
+    copy_path(MEDIA_DIR, 'template', project_dir, build_dir)
+    copy_path(IMAGE_DIR, 'content', project_dir, build_dir)
+    build_scss(os.path.join(build_dir, MEDIA_DIR))
+
+def copy_path(directory, parent, project_dir, build_dir):
+    from_dir = os.path.join(project_dir, parent, directory)
+    to_dir = os.path.join(build_dir, directory)
+    shutil.copytree(from_dir, to_dir)
 
 def run_server(project_dir):
     os.chdir(os.path.join(project_dir, BUILD_DIR))
