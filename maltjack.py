@@ -50,7 +50,7 @@ def build_pages(project_dir, build_dir):
     content_dir = os.path.join(project_dir, 'content')
 
     for root, dirs, filenames in os.walk(content_dir):
-        if root.rsplit('/', 1)[1] != IMAGE_DIR:
+        if root.replace(content_dir + '/', '').split('/')[0] != IMAGE_DIR:
             for f in filenames:
                 filename = os.path.join(root, f)
                 file_relative = filename.replace(content_dir + '/', '')
