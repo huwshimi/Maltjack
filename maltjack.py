@@ -16,6 +16,7 @@ BUILD_DIR = 'build'
 CONTENT_DIR = 'content'
 MEDIA_DIR = 'media'
 IMAGE_DIR = 'images'
+ERROR_404 = '404.html'
 
 class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
@@ -26,11 +27,17 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             file_path = os.path.join(ARGS.directory, BUILD_DIR)
             filename =  os.path.join(file_path, '%s.html' % path)
             if os.path.isfile(filename):
-                return filename
+                new_path = filename
             else:
-                return os.path.join(file_path, path, 'index.html')
+                new_path = os.path.join(file_path, path, 'index.html')
         else:
-            return os.path.join(ARGS.directory, BUILD_DIR, path)
+            new_path = os.path.join(ARGS.directory, BUILD_DIR, path)
+
+        if os.path.isfile(new_path):
+            return new_path
+        else:
+            return os.path.join(ARGS.directory, BUILD_DIR, ERROR_404)
+
 
     def do_GET(self):
         build_site(ARGS.directory)
