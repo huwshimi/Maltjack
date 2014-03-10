@@ -52,8 +52,12 @@ def build_site(project_dir):
     build_pages(project_dir, build_dir)
     build_media(project_dir, build_dir)
 
+def format_thousands(value):
+    return "{:,}".format(value)
+
 def build_pages(project_dir, build_dir):
     env = Environment(loader=FileSystemLoader(project_dir))
+    env.filters['thousands'] = format_thousands
     content_dir = os.path.join(project_dir, 'content')
 
     for root, dirs, filenames in os.walk(content_dir):
